@@ -96,6 +96,15 @@ dependencies {
     //custom loading
     implementation(libs.msz.progress.indicator)
 
+    //accompanist for pager
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
+
+    //coil
+    implementation(libs.coil.compose)
+    //for gif play
+    implementation(libs.coil.gif)
+
 
 }
 kapt {

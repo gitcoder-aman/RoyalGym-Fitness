@@ -1,9 +1,12 @@
 package com.example.royalgymfitness.presentations.nav_graph.gym_navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -12,17 +15,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.royalgymfitness.R
-import com.example.royalgymfitness.backend.viewmodel.HomeViewModel
+import com.example.royalgymfitness.backend.domain.model.ExerciseModel
+import com.example.royalgymfitness.backend.util.WorkoutType
+import com.example.royalgymfitness.backend.viewmodel.ExerciseViewModel
+import com.example.royalgymfitness.presentations.allexercises.AllExerciseScreen
 import com.example.royalgymfitness.presentations.favourite.FavouriteScreen
 import com.example.royalgymfitness.presentations.home.HomeScreen
+import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_DETAIL_MODEL
+import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_IMAGE
+import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_NAME
+import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_WORKOUT_TYPE
 import com.example.royalgymfitness.presentations.nav_graph.Routes
-import com.example.royalgymfitness.presentations.profile.ProfileScreen
+import com.example.royalgymfitness.presentations.otherscreen.ExerciseDetailScreen
+import com.example.royalgymfitness.presentations.otherscreen.ExerciseScreen
 import com.example.royalgymfitness.presentations.splash.SplashScreen
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import java.net.URLDecoder
+import java.util.Locale
 
 @Composable
 fun GymNavigator() {
@@ -30,8 +47,8 @@ fun GymNavigator() {
     val bottomNavigationItem = remember {
         listOf(
             BottomNavigationItem(icon = R.drawable.home, text = "Home"),
-            BottomNavigationItem(icon = R.drawable.heart, text = "Favourite"),
-            BottomNavigationItem(icon = R.drawable.user, text = "Profile")
+            BottomNavigationItem(icon = R.drawable.exercise, text = "Exercises"),
+            BottomNavigationItem(icon = R.drawable.heart, text = "Favourites")
         )
     }
     val navController = rememberNavController()
@@ -42,13 +59,13 @@ fun GymNavigator() {
     selectedItem = remember(key1 = backStackState) {
         when (backStackState?.destination?.route) {
             Routes.HomeScreen.route -> 0
-            Routes.FavouriteScreen.route -> 1
-            Routes.ProfileScreen.route -> 2
+            Routes.AllExerciseScreen.route -> 1
+            Routes.FavouriteScreen.route -> 2
             else -> 0
         }
     }
     val isBottomBarVisible = remember(key1 = backStackState) {
-        backStackState?.destination?.route == Routes.HomeScreen.route || backStackState?.destination?.route == Routes.FavouriteScreen.route || backStackState?.destination?.route == Routes.ProfileScreen.route
+        backStackState?.destination?.route == Routes.HomeScreen.route || backStackState?.destination?.route == Routes.FavouriteScreen.route || backStackState?.destination?.route == Routes.AllExerciseScreen.route
     }
 
     Scaffold(
@@ -67,12 +84,12 @@ fun GymNavigator() {
 
                             1 -> navigateToTab(
                                 navController = navController,
-                                route = Routes.FavouriteScreen.route
+                                route = Routes.AllExerciseScreen.route
                             )
 
                             2 -> navigateToTab(
                                 navController = navController,
-                                route = Routes.ProfileScreen.route
+                                route = Routes.FavouriteScreen.route
                             )
                         }
                     }
@@ -90,17 +107,109 @@ fun GymNavigator() {
                 SplashScreen(navController)
             }
             composable(route = Routes.HomeScreen.route) {
-                val homeViewModel: HomeViewModel = hiltViewModel()
-                HomeScreen(homeViewModel,navController)
+                HomeScreen(navController)
             }
             composable(route = Routes.FavouriteScreen.route) {
                 FavouriteScreen()
             }
-            composable(route = Routes.ProfileScreen.route) {
-                ProfileScreen()
+            composable(route = Routes.AllExerciseScreen.route) {
+                AllExerciseScreen()
             }
-        }
+            composable(
+                route = Routes.ExerciseScreen.route, arguments = listOf(
+                    navArgument(ARG_KEY_EXERCISE_IMAGE) { type = NavType.StringType },
+                    navArgument(ARG_KEY_EXERCISE_NAME) { type = NavType.StringType },
+                    navArgument(ARG_KEY_WORKOUT_TYPE) { type = NavType.StringType }
+                )
+            ) {
+                val exerciseImage = remember {
+                    it.arguments?.getString(ARG_KEY_EXERCISE_IMAGE)
+                        ?.let { URLDecoder.decode(it, "UTF-8") }
+                }
+                val exerciseName = remember {
+                    it.arguments?.getString(ARG_KEY_EXERCISE_NAME)?.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                    }
+                }
+                val workoutType = remember {
+                    it.arguments?.getString(ARG_KEY_WORKOUT_TYPE)
+                }
 
+                val exerciseViewModel: ExerciseViewModel = hiltViewModel()
+
+                BackHandler {
+                    // Handle custom back press logic here if needed
+                    navController.popBackStack()
+                }
+
+                LaunchedEffect(workoutType, exerciseName) {
+                    when (workoutType) {
+                        WorkoutType.TARGET.toString() -> {
+                            exerciseViewModel.getTargetExercise(
+                                exerciseName?.lowercase().toString()
+                            )
+                        }
+
+                        WorkoutType.BODY.toString() -> {
+                            exerciseViewModel.getBodyPartExercise(
+                                exerciseName?.lowercase().toString()
+                            )
+                        }
+
+                        WorkoutType.EQUIPMENT.toString() -> {
+                            exerciseViewModel.getEquipmentExercise(
+                                exerciseName?.lowercase().toString()
+                            )
+                        }
+                    }
+                }
+
+                val targetExerciseListState by exerciseViewModel.targetExerciseList.collectAsState()
+                val bodyPartExerciseListState by exerciseViewModel.bodyPartExerciseList.collectAsState()
+                val equipmentExerciseListState by exerciseViewModel.equipmentExerciseList.collectAsState()
+
+                when (workoutType) {
+                    WorkoutType.TARGET.toString() -> {
+                        ExerciseScreen(
+                            navController,
+                            exerciseName,
+                            exerciseImage,
+                            workoutType,
+                            targetExerciseListState
+                        )
+                    }
+
+                    WorkoutType.BODY.toString() -> {
+                        ExerciseScreen(
+                            navController,
+                            exerciseName,
+                            exerciseImage,
+                            workoutType,
+                            bodyPartExerciseListState
+                        )
+                    }
+
+                    else -> {
+                        ExerciseScreen(
+                            navController,
+                            exerciseName,
+                            exerciseImage,
+                            workoutType,
+                            equipmentExerciseListState
+                        )
+                    }
+                }
+            }
+            composable(route = Routes.ExerciseDetailScreen.route, arguments = listOf(
+                navArgument(ARG_KEY_EXERCISE_DETAIL_MODEL) { type = NavType.StringType }
+            )) {
+                val exerciseDetail = it.arguments?.getString(ARG_KEY_EXERCISE_DETAIL_MODEL)
+                val exerciseDetailJson =
+                    exerciseDetail?.let { it1 -> Json.decodeFromString<ExerciseModel>(it1) }
+                ExerciseDetailScreen(navController, exerciseDetailJson)
+            }
+
+        }
     }
 }
 

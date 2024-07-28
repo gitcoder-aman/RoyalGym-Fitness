@@ -1,5 +1,11 @@
 package com.example.royalgymfitness.backend.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+
+@Parcelize
+@Serializable
 data class ExerciseModel(
     val bodyPart: String,
     val equipment: String,
@@ -9,4 +15,4 @@ data class ExerciseModel(
     val name: String,
     val secondaryMuscles: List<String>,
     val target: String
-)
+) : Parcelable
