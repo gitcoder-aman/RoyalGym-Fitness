@@ -105,6 +105,16 @@ dependencies {
     //for gif play
     implementation(libs.coil.gif)
 
+    //Room
+    implementation(libs.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler) // For Kotlin use only
+
+    // Gson for JSON conversion
+    implementation(libs.gson)
+
+    implementation(libs.androidx.runtime.livedata) // Update the version as needed
+
 
 }
 kapt {

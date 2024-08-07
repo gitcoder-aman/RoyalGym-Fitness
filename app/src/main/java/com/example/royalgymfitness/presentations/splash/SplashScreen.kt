@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,17 +80,17 @@ fun SplashScreen(navController: NavHostController) {
                     animationDelay = 200,
                     startDelay = 0
                 )
-                val scope = rememberCoroutineScope()
-
-                scope.launch {
-                    delay(3000)
-                    navController.navigate(Routes.HomeScreen.route) {
-                        popUpTo(Routes.SplashScreen.route) {
-                            inclusive = true
-                        }
-                    }
+            }
+        }
+    }
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(key1 = Unit) {
+        delay(3000)
+        coroutineScope.launch {
+            navController.navigate(Routes.TabScreen.route) {
+                popUpTo(Routes.SplashScreen.route) {
+                    inclusive = true
                 }
-
             }
         }
     }

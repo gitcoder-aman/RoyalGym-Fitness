@@ -7,6 +7,7 @@ const val ARG_KEY_EXERCISE_DETAIL_MODEL = "arg_key_exercise_detail_model"
 
 sealed class Routes(val route: String) {
     object HomeScreen : Routes(route = "home_screen")
+    object TabScreen : Routes(route = "tab_screen")
     object FavouriteScreen : Routes(route = "fav_screen")
     object AllExerciseScreen : Routes(route = "all_exercises_screen")
     object SplashScreen : Routes(route = "splash_screen")

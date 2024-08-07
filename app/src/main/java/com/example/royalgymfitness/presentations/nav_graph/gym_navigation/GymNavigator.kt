@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,9 +26,10 @@ import com.example.royalgymfitness.R
 import com.example.royalgymfitness.backend.domain.model.ExerciseModel
 import com.example.royalgymfitness.backend.util.WorkoutType
 import com.example.royalgymfitness.backend.viewmodel.ExerciseViewModel
+import com.example.royalgymfitness.db.presentation.ExerciseDBViewModel
 import com.example.royalgymfitness.presentations.allexercises.AllExerciseScreen
 import com.example.royalgymfitness.presentations.favourite.FavouriteScreen
-import com.example.royalgymfitness.presentations.home.HomeScreen
+import com.example.royalgymfitness.presentations.home.TabSection
 import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_DETAIL_MODEL
 import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_IMAGE
 import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_NAME
@@ -35,6 +37,7 @@ import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_WORKOUT_TYPE
 import com.example.royalgymfitness.presentations.nav_graph.Routes
 import com.example.royalgymfitness.presentations.otherscreen.ExerciseDetailScreen
 import com.example.royalgymfitness.presentations.otherscreen.ExerciseScreen
+import com.example.royalgymfitness.presentations.otherscreen.ExerciseState
 import com.example.royalgymfitness.presentations.splash.SplashScreen
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -58,14 +61,14 @@ fun GymNavigator() {
     }
     selectedItem = remember(key1 = backStackState) {
         when (backStackState?.destination?.route) {
-            Routes.HomeScreen.route -> 0
+            Routes.TabScreen.route -> 0
             Routes.AllExerciseScreen.route -> 1
             Routes.FavouriteScreen.route -> 2
             else -> 0
         }
     }
     val isBottomBarVisible = remember(key1 = backStackState) {
-        backStackState?.destination?.route == Routes.HomeScreen.route || backStackState?.destination?.route == Routes.FavouriteScreen.route || backStackState?.destination?.route == Routes.AllExerciseScreen.route
+        backStackState?.destination?.route == Routes.TabScreen.route || backStackState?.destination?.route == Routes.FavouriteScreen.route || backStackState?.destination?.route == Routes.AllExerciseScreen.route
     }
 
     Scaffold(
@@ -79,7 +82,7 @@ fun GymNavigator() {
                         when (it) {
                             0 -> navigateToTab(
                                 navController = navController,
-                                route = Routes.HomeScreen.route
+                                route = Routes.TabScreen.route
                             )
 
                             1 -> navigateToTab(
@@ -106,9 +109,12 @@ fun GymNavigator() {
             composable(route = Routes.SplashScreen.route) {
                 SplashScreen(navController)
             }
-            composable(route = Routes.HomeScreen.route) {
-                HomeScreen(navController)
+            composable(route = Routes.TabScreen.route) {
+                TabSection(navController)
             }
+//            composable(route = Routes.HomeScreen.route) {
+//                HomeScreen(navController)
+//            }
             composable(route = Routes.FavouriteScreen.route) {
                 FavouriteScreen()
             }
@@ -168,9 +174,18 @@ fun GymNavigator() {
                 val bodyPartExerciseListState by exerciseViewModel.bodyPartExerciseList.collectAsState()
                 val equipmentExerciseListState by exerciseViewModel.equipmentExerciseList.collectAsState()
 
+
+                //here to implement db for store exerciseList through favorite section
+                val exerciseDbViewModel: ExerciseDBViewModel = hiltViewModel()
+                val isFavoriteState by exerciseDbViewModel.isFavorite.observeAsState(ExerciseState.Loading)
+//                val exerciseListState by exerciseDbViewModel.listOfExercises.observeAsState(ExerciseState.Loading)
+
                 when (workoutType) {
                     WorkoutType.TARGET.toString() -> {
                         ExerciseScreen(
+                            exerciseDbViewModel,
+                            isFavoriteState,
+//                            exerciseListState,
                             navController,
                             exerciseName,
                             exerciseImage,
@@ -181,6 +196,9 @@ fun GymNavigator() {
 
                     WorkoutType.BODY.toString() -> {
                         ExerciseScreen(
+                            exerciseDbViewModel,
+                            isFavoriteState,
+//                            exerciseListState,
                             navController,
                             exerciseName,
                             exerciseImage,
@@ -191,6 +209,9 @@ fun GymNavigator() {
 
                     else -> {
                         ExerciseScreen(
+                            exerciseDbViewModel,
+                            isFavoriteState,
+//                            exerciseListState,
                             navController,
                             exerciseName,
                             exerciseImage,
@@ -206,7 +227,12 @@ fun GymNavigator() {
                 val exerciseDetail = it.arguments?.getString(ARG_KEY_EXERCISE_DETAIL_MODEL)
                 val exerciseDetailJson =
                     exerciseDetail?.let { it1 -> Json.decodeFromString<ExerciseModel>(it1) }
-                ExerciseDetailScreen(navController, exerciseDetailJson)
+
+                val exerciseDbViewModel: ExerciseDBViewModel = hiltViewModel()
+                val isFavoriteState by exerciseDbViewModel.isFavorite.observeAsState(ExerciseState.Loading)
+                val exerciseFavListState by exerciseDbViewModel.exerciseFavList.observeAsState(ExerciseState.Loading)
+
+                ExerciseDetailScreen(exerciseDbViewModel,isFavoriteState,exerciseFavListState,navController, exerciseDetailJson)
             }
 
         }

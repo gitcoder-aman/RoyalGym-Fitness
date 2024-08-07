@@ -54,6 +54,7 @@ class ExerciseViewModel @Inject constructor(private val exercisesRepository: Exe
                 _targetExerciseList.value = ExerciseState.Success(targetExercisesList)
                 Log.d("@@viewModel", "getTargetExercise: ${targetExerciseList.value}")
             } catch (e: Exception) {
+                Log.d("@@viewModel", "getTargetExercise: ${e.message}")
                 _targetExerciseList.value = ExerciseState.Error(e.message.toString())
             }
         }

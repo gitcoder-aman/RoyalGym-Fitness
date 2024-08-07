@@ -1,8 +1,10 @@
 package com.example.royalgymfitness.presentations.otherscreen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,17 +17,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -35,6 +47,7 @@ import coil.compose.AsyncImage
 import com.ehsanmsz.mszprogressindicator.progressindicator.LineScaleProgressIndicator
 import com.example.royalgymfitness.R
 import com.example.royalgymfitness.backend.domain.model.ExerciseModel
+import com.example.royalgymfitness.db.presentation.ExerciseDBViewModel
 import com.example.royalgymfitness.presentations.home.components.TextComponent
 import com.example.royalgymfitness.presentations.nav_graph.Routes
 import com.example.royalgymfitness.ui.theme.DarkBlue
@@ -46,6 +59,9 @@ import java.nio.charset.StandardCharsets
 
 @Composable
 fun ExerciseScreen(
+    exerciseDbViewModel: ExerciseDBViewModel,
+    isFavoriteState: ExerciseState<Boolean>,
+//    exerciseFavListState: ExerciseState<List<ExerciseListEntity>>,
     navController: NavHostController,
     exerciseName: String?,
     exerciseImage: String?,
@@ -92,7 +108,7 @@ fun ExerciseScreen(
                 contentAlignment = Alignment.Center
             ) {
                 TextComponent(
-                    text = "Something went wrong 429 .Your API Services Exceed for this month",
+                    text = exerciseListState.message,
                     fontSize = 24.sp
                 )
             }
@@ -106,6 +122,9 @@ fun ExerciseScreen(
 
     if (exerciseList.value.isNotEmpty()) {
         LaunchScreen(
+            exerciseDbViewModel,
+            isFavoriteState,
+            exerciseListState,
             navController,
             workoutType,
             exerciseName,
@@ -118,12 +137,65 @@ fun ExerciseScreen(
 
 @Composable
 fun LaunchScreen(
+    exerciseDbViewModel: ExerciseDBViewModel,
+    isFavoriteState: ExerciseState<Boolean>,
+    exerciseFavListState: ExerciseState<List<ExerciseModel>>,
     navController: NavHostController,
     workoutType: String?,
     exerciseName: String?,
     exerciseImage: String?,
-    targetExerciseList: MutableState<List<ExerciseModel>>
+    exerciseList: MutableState<List<ExerciseModel>>
 ) {
+    val context = LocalContext.current
+
+    var isFav by rememberSaveable {
+        mutableStateOf(false)
+    }
+    //fav like state handle
+//    when(exerciseFavListState){
+//        is ExerciseState.Loading -> {
+//            CircularProgressIndicator()
+//        }
+//        is ExerciseState.Success -> {
+//            val exerciseFavList = exerciseFavListState.data
+//            for (i in exerciseFavList.indices) {
+//                if (exerciseFavList[i].id == exerciseFavList.) {
+//                    isFav = true
+//                }
+//            }
+//        }
+//        is ExerciseState.Error -> {
+//            val errorMessage = exerciseFavListState.message
+//            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+//        }
+//
+//    }
+
+    //do like or unlike exercise
+    when (isFavoriteState) {
+        is ExerciseState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is ExerciseState.Success -> {
+            val isFavorite = isFavoriteState.data
+            if (isFavorite) {
+                isFav = true
+                Toast.makeText(context, "Saved this Exercise", Toast.LENGTH_SHORT).show()
+            } else {
+                isFav = false
+                Toast.makeText(context, "Remove this Exercise", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        is ExerciseState.Error -> {
+            val errorMessage = isFavoriteState.message
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+
+        }
+
+        else -> {}
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -136,25 +208,30 @@ fun LaunchScreen(
             horizontalAlignment = Alignment.Start
         ) {
             item {
-                ExerciseImage(exerciseImage = exerciseImage,
+                ExerciseImage(isFav = isFav, exerciseImage = exerciseImage,
                     exerciseName = exerciseName,
-                    exerciseListSize = targetExerciseList.value.size.toString(),
+                    exerciseListSize = exerciseList.value.size.toString(),
                     workoutType = workoutType,
                     onFavClick = {
+                        if (isFav) {
+//                            exerciseDbViewModel.favRemoveListOfExercises(1)
+                        } else {
+//                            exerciseDbViewModel.favListOfExercises(exerciseList.value)
+                        }
                     },
                     onBackClick = {
                         navController.navigateUp()
                     }
                 )
             }
-            items(targetExerciseList.value.size) {
+            items(exerciseList.value.size) {
                 ExercisesView(
-                    exerciseName = targetExerciseList.value[it].name,
-                    equipmentName = targetExerciseList.value[it].equipment,
-                    exerciseImage = targetExerciseList.value[it].gifUrl,
+                    exerciseName = exerciseList.value[it].name,
+                    equipmentName = exerciseList.value[it].equipment,
+                    exerciseImage = exerciseList.value[it].gifUrl,
                     onClick = {
                         val exerciseDetail = URLEncoder.encode(
-                            Json.encodeToString(targetExerciseList.value[it]),
+                            Json.encodeToString(exerciseList.value[it]),
                             StandardCharsets.UTF_8.toString()
                         )
                         Log.d("@@detail", "LaunchScreen: $exerciseDetail")
@@ -172,6 +249,7 @@ fun LaunchScreen(
 
 @Composable
 fun ExerciseImage(
+    isFav: Boolean,
     exerciseImage: String?,
     exerciseName: String?,
     exerciseListSize: String,
@@ -193,28 +271,38 @@ fun ExerciseImage(
                 .height(300.dp)
         )
         Icon(
-            painter = painterResource(id = R.drawable.back),
+            imageVector = Icons.Default.KeyboardArrowLeft,
             contentDescription = "",
-            tint = Color.Unspecified,
+            tint = Color.White,
             modifier = Modifier
                 .padding(start = 12.dp, top = 12.dp)
-                .size(50.dp)
+                .background(Color.DarkGray, shape = CircleShape)
+                .padding(4.dp)
+                .size(35.dp)
                 .align(Alignment.TopStart)
-                .clickable {
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
                     onBackClick()
                 }
         )
         Icon(
-            painter = painterResource(id = R.drawable.fav_icon),
+            imageVector = if (isFav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
             contentDescription = "",
             modifier = Modifier
                 .padding(end = 12.dp, top = 12.dp)
+                .background(Color.DarkGray, shape = CircleShape)
+                .padding(4.dp)
                 .align(Alignment.TopEnd)
-                .size(50.dp)
-                .clickable {
+                .size(35.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
                     onFavClick()
                 },
-            tint = Color.Unspecified
+            tint = if (isFav) Color.Red else Color.White
         )
 
         Column(
