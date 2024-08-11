@@ -1,5 +1,6 @@
 package com.example.royalgymfitness.presentations.home.weekly_plan
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +51,7 @@ fun MessageCardView(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.Start
     ) {
-        var isExpanded by remember { mutableStateOf(false) }
+        var isExpanded by rememberSaveable { mutableStateOf(false) }
         // surfaceColor will be updated gradually from one color to the other
         val surfaceColor by animateColorAsState(
             if (isExpanded) MaterialTheme.colorScheme.primary else MainColor,
@@ -89,6 +91,7 @@ fun MessageCardView(
             if(day != "Sunday") {
                 for (exerciseName in listOfExercises) {
                     WorkOutListView(exerciseName) {
+                        Log.d("@@exerciseName", "MessageCardView: $exerciseName")
                         onClick(exerciseName)
                     }
                 }

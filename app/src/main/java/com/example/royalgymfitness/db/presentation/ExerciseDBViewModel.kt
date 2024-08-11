@@ -1,11 +1,13 @@
 package com.example.royalgymfitness.db.presentation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.royalgymfitness.backend.domain.model.ExerciseModel
 import com.example.royalgymfitness.db.domain.model.ExerciseEntity
+import com.example.royalgymfitness.db.domain.model.ExerciseListEntity
 import com.example.royalgymfitness.db.repository.ExerciseRepository
 import com.example.royalgymfitness.presentations.otherscreen.ExerciseState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,51 +25,52 @@ class ExerciseDBViewModel @Inject constructor(
     private val _isFavorite = MutableLiveData<ExerciseState<Boolean>>(ExerciseState.Loading)
     val isFavorite: LiveData<ExerciseState<Boolean>> get() = _isFavorite
 
-    private val _listOfExercises = MutableLiveData<ExerciseState<List<ExerciseModel>>>()
-    val listOfExercises : LiveData<ExerciseState<List<ExerciseModel>>> get() = _listOfExercises
+    private val _listExerciseBundle = MutableLiveData<ExerciseState<List<ExerciseListEntity>>>(null)
+    val listExerciseBundle : LiveData<ExerciseState<List<ExerciseListEntity>>> get() = _listExerciseBundle
 
     init {
         getAllExercises()
-//        getAllListOfExercises()
+        getListFavBundleOfExercises()
     }
 
-//    private fun getAllListOfExercises() {
-//        viewModelScope.launch {
-//            _listOfExercises.value = ExerciseState.Loading
-//            try {
-//                val listOfExercises = exerciseRepository.getAllListOfExercises()
-//                _listOfExercises.value = ExerciseState.Success(listOfExercises)
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                _listOfExercises.value = ExerciseState.Error(e.message.toString())
-//            }
-//        }
-//    }
-//    fun favListOfExercises(exerciseList: List<ExerciseModel>) {
-//        viewModelScope.launch {
-//            _isFavorite.value = ExerciseState.Loading
-//            try {
-//                _isFavorite.value = ExerciseState.Success(true)
-//                exerciseRepository.insertListOfExercises(exerciseList)
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                _listOfExercises.value = ExerciseState.Error(e.message.toString())
-//            }
-//        }
-//    }
+    private fun getListFavBundleOfExercises() {
+        viewModelScope.launch {
+            _listExerciseBundle.value = ExerciseState.Loading
+            try {
+                val listOfExercisesBundle = exerciseRepository.getListFavBundleOfExercises()
+                _listExerciseBundle.value = ExerciseState.Success(listOfExercisesBundle)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _listExerciseBundle.value = ExerciseState.Error(e.message.toString())
+            }
+        }
+    }
+    fun insertBundleFavListOfExercises(exerciseList: ExerciseListEntity) {
+        viewModelScope.launch {
+            _isFavorite.value = ExerciseState.Loading
+            try {
+                _isFavorite.value = ExerciseState.Success(true)
+                exerciseRepository.insertListOfExercises(exerciseList)
+                getListFavBundleOfExercises()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _isFavorite.value = ExerciseState.Success(false)
+            }
+        }
+    }
 
-//    fun favRemoveListOfExercises(id : Int) {
-//        viewModelScope.launch {
-//            _isFavorite.value = ExerciseState.Loading
-//            try {
-//                exerciseRepository.deleteListOfExercises(id)
-//                _isFavorite.value = ExerciseState.Success(false)
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                _isFavorite.value = ExerciseState.Error(e.message.toString())
-//            }
-//        }
-//    }
+    fun favRemoveListOfBundleExercises(id : String) {
+        viewModelScope.launch {
+            _isFavorite.value = ExerciseState.Loading
+            try {
+                exerciseRepository.deleteListOfBundleExercises(id)
+                _isFavorite.value = ExerciseState.Success(false)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _isFavorite.value = ExerciseState.Error(e.message.toString())
+            }
+        }
+    }
 
     fun favExercise(exercise: ExerciseEntity) {
 

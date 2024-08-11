@@ -2,11 +2,12 @@ package com.example.royalgymfitness.backend.util
 
 object Constants {
     const val BASE_URL = "https://exercisedb.p.rapidapi.com/"
-    const val API_KEY = "6f692bef33msh5960f4123c6abfdp14ec95jsn768bc1110b47"
+    const val API_KEY = "195d32fc07msh0e9cb0c36eb5f03p1f8f0ajsn3562391725e3"
     const val API_HOST = "exercisedb.p.rapidapi.com"
 }
-enum class WorkoutType(){
-    TARGET,BODY,EQUIPMENT
+
+enum class WorkoutType() {
+    TARGET, BODY, EQUIPMENT
 }
 
 val targetMap = mapOf(
@@ -70,4 +71,23 @@ val equipmentMap = mapOf(
     "upper body ergometer" to "https://thumbs.dreamstime.com/b/ergometer-upper-body-hand-cycling-arm-shoulder-training-rehabilitation-ergometer-upper-body-hand-cycling-arm-307143240.jpg?w=768",
     "weighted" to "https://media.istockphoto.com/id/1026603090/photo/weighted-squats.jpg?s=612x612&w=0&k=20&c=8hRzSL0Bteu4Wkc0ZoLbM98nYMUnPVjmM5tFqhghsEE=",
     "wheel roller" to "https://media.istockphoto.com/id/919567346/photo/handsome-man-training-with-wheel-to-strengthen-his-abdominal-muscle.jpg?s=612x612&w=0&k=20&c=TVPFjd4Y-T3zksolrhGGvSrfYCplsOrPkTpltBijJYI="
+)
+val mapOfDayExerciseImage = mapOf(
+    "chest" to "https://media.istockphoto.com/id/610554346/photo/gym-workout.jpg?s=612x612&w=0&k=20&c=yV2zqxPnwB2pIIWnHZJuQRLh8cRzgk5gjJPgCbUkOHY=",
+    "triceps" to "https://www.shutterstock.com/image-photo/strong-muscular-handsome-bald-man-600nw-2229623905.jpg",
+    "back" to "https://media.istockphoto.com/id/635971942/photo/back-view-young-adult-girl-doing-barbell-squats.jpg?s=612x612&w=0&k=20&c=7ka8tL-bQ0qSzRw3c0WbAUZ3Ni0mpQdqA4gC0nF14YY=",
+    "biceps" to "https://www.shutterstock.com/image-photo/asian-man-shirtless-workout-weight-600nw-2280545545.jpg",
+    "abs" to "https://media.istockphoto.com/id/998035336/photo/muscular-man-standing-in-the-gym.jpg?s=612x612&w=0&k=20&c=J6L6VcDGRs_wVt5B0uEIulZE0NkHNenlNZigUoFVZBU=",
+    "upper legs" to "https://media.istockphoto.com/id/1057146526/photo/handsome-man-legs-workout-with-kettlebell-in-the-gym.jpg?s=612x612&w=0&k=20&c=nBQNKfiOa-gYTLNQuWhRNjyIVnMQC_eIizWTqKw2aRU=",
+    "lower legs" to "https://img.freepik.com/free-photo/low-angle-man-training-gym_23-2149517298.jpg",
+    "shoulders" to "https://media.istockphoto.com/id/456740017/photo/shoulders-cable-lateral-raise-exercise.jpg?s=612x612&w=0&k=20&c=OWgZeQqx-bpyA2EGNMAfW4UO6eXZRWxx924q-PP9tsE=",
+)
+val mapOfExerciseListWithDay = mapOf(
+    "Monday" to listOf("CHEST", "TRICEPS"),
+    "Tuesday" to listOf("BACK", "BICEPS", "ABS"),
+    "Wednesday" to listOf("UPPER LEGS", "LOWER LEGS", "SHOULDERS"),
+    "Thursday" to listOf("CHEST", "TRICEPS"),
+    "Friday" to listOf("BACK", "BICEPS", "ABS"),
+    "Saturday" to listOf("UPPER LEGS", "LOWER LEGS", "SHOULDERS"),
+    "Sunday" to listOf("REST"),
 )

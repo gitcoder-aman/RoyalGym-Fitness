@@ -93,9 +93,6 @@ dependencies {
     //serialization
     implementation(libs.kotlinx.serialization.json)
 
-    //custom loading
-    implementation(libs.msz.progress.indicator)
-
     //accompanist for pager
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
@@ -114,6 +111,9 @@ dependencies {
     implementation(libs.gson)
 
     implementation(libs.androidx.runtime.livedata) // Update the version as needed
+
+    //for status bar color change
+    implementation(libs.accompanist.systemuicontroller)
 
 
 }

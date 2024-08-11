@@ -1,6 +1,5 @@
 package com.example.royalgymfitness.presentations.home
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,18 +16,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -57,10 +53,13 @@ import com.example.royalgymfitness.ui.theme.MainColor
 import java.net.URLEncoder
 import java.util.Locale
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun HomeScreen(navController: NavHostController) {
 
+
+    var searchText by rememberSaveable {
+        mutableStateOf("")
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -77,7 +76,11 @@ fun HomeScreen(navController: NavHostController) {
         ) {
             HeaderHomeScreen()
             Spacer(modifier = Modifier.height(12.dp))
-            SearchSection()
+            SearchSection(Modifier, searchText, onNavigationScreen = {
+                navController.navigate(Routes.AllExerciseScreen.passSearchText(searchText))
+            }) {
+                searchText = it
+            }
             Spacer(modifier = Modifier.height(16.dp))
 //            TextComponent(
 //                text = "Daily Monitoring",
@@ -224,16 +227,17 @@ fun HeaderHomeScreen() {
 }
 
 @Composable
-@Preview
-fun SearchSection() {
+fun SearchSection(
+    modifier: Modifier = Modifier,
+    searchText: String,
+    onNavigationScreen: () -> Unit = {},
+    onValueChange: (String) -> Unit
+) {
 
-    var searchText by remember {
-        mutableStateOf("")
-    }
     TextField(
         value = searchText,
         onValueChange = {
-            searchText = it
+            onValueChange(it)
         },
         trailingIcon = {
             Icon(
@@ -242,7 +246,7 @@ fun SearchSection() {
                 tint = Color.Unspecified, modifier = Modifier.size(24.dp)
             )
         },
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(Color.Transparent),
         shape = RoundedCornerShape(24.dp),
@@ -253,16 +257,24 @@ fun SearchSection() {
                 font = R.font.sans_medium,
                 fontStyle = FontStyle.Italic
             )
-        }, colors = TextFieldDefaults.colors(
+        },
+        colors = TextFieldDefaults.colors(
             unfocusedContainerColor = DarkBlue,
             focusedTextColor = Color.White,
-            unfocusedTextColor = Color.Transparent,
+            unfocusedTextColor = Color.White,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             focusedContainerColor = DarkBlue,
-        ), keyboardOptions = KeyboardOptions(
+        ),
+        keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Search // Specify the keyboard action here
+        ), keyboardActions = KeyboardActions(
+            onSearch = {
+                // Trigger the search when the "Search" action is pressed
+                onNavigationScreen()
+            }
         )
+
     )
 }
 

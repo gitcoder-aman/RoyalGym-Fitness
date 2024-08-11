@@ -266,7 +266,6 @@ fun ExerciseThumbnail(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 32.dp)
     ) {
         GifImagePlay(
             gifLink = exerciseImage.toString()

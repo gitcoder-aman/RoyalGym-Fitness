@@ -2,12 +2,14 @@ package com.example.royalgymfitness.db.repository
 
 import com.example.royalgymfitness.backend.domain.model.ExerciseModel
 import com.example.royalgymfitness.db.dao.ExerciseDao
+import com.example.royalgymfitness.db.dao.ExerciseListDao
 import com.example.royalgymfitness.db.domain.model.ExerciseEntity
+import com.example.royalgymfitness.db.domain.model.ExerciseListEntity
 import javax.inject.Inject
 
 class ExerciseRepository @Inject constructor(
     private val exerciseDao: ExerciseDao,
-//    private val exerciseListDao: ExerciseListDao
+    private val exerciseListDao: ExerciseListDao
 ) {
     suspend fun getAllExercises(): List<ExerciseEntity> {
         return exerciseDao.getAllExercises()
@@ -21,14 +23,16 @@ class ExerciseRepository @Inject constructor(
     suspend fun deleteExercise(exerciseId: String) {
         return exerciseDao.deleteExercise(exerciseId)
     }
-//    suspend fun insertListOfExercises(listOfExercises : List<ExerciseModel>){
-//        return exerciseListDao.insertListOfExercise(listOfExercises)
-//    }
-//    suspend fun getAllListOfExercises() : List<ExerciseModel>{
-//        return exerciseListDao.getAllListOfExercises()
-//    }
 
-//    suspend fun deleteListOfExercises(id : Int) {
-//        return exerciseListDao.deleteListOfExercises(id)
-//    }
+    //here to list of bundle Exercises
+    suspend fun insertListOfExercises(listOfExercises : ExerciseListEntity){
+        return exerciseListDao.insertListOfExercise(listOfExercises)
+    }
+    suspend fun getListFavBundleOfExercises() : List<ExerciseListEntity>{
+        return exerciseListDao.getListFavBundleOfExercises()
+    }
+
+    suspend fun deleteListOfBundleExercises(id : String) {
+        return exerciseListDao.deleteListOfBundleExercises(id)
+    }
 }

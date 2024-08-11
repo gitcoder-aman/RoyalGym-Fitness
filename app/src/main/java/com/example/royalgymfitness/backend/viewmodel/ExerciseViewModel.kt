@@ -38,8 +38,8 @@ class ExerciseViewModel @Inject constructor(private val exercisesRepository: Exe
     private fun getExercises() {
         viewModelScope.launch {
             try {
-                val exercises = exercisesRepository.getExercises()
-                _exerciseList.value = ExerciseState.Success(exercises)
+                val exercisesList = exercisesRepository.getExercises()
+                _exerciseList.value = ExerciseState.Success(exercisesList)
             } catch (e: Exception) {
                 _exerciseList.value = ExerciseState.Error(e.message.toString())
             }
@@ -47,6 +47,8 @@ class ExerciseViewModel @Inject constructor(private val exercisesRepository: Exe
     }
 
     fun getTargetExercise(targetExerciseName: String) {
+        Log.d("@@viewModel", "getTargetExercise: $targetExerciseName")
+
         viewModelScope.launch {
             _targetExerciseList.value = ExerciseState.Loading
             try {

@@ -7,19 +7,19 @@ import com.google.gson.reflect.TypeToken
 
 class Convertors {
 
-//    @TypeConverter
-//    fun fromExerciseList(value: List<ExerciseModel>?): String {
-//        val gson = Gson()
-//        val type = object : TypeToken<List<ExerciseModel>>() {}.type
-//        return gson.toJson(value, type)
-//    }
-//
-//    @TypeConverter
-//    fun toExerciseList(value: String): List<ExerciseModel>? {
-//        val gson = Gson()
-//        val type = object : TypeToken<List<ExerciseModel>>() {}.type
-//        return gson.fromJson(value, type)
-//    }
+    @TypeConverter
+    fun fromExerciseList(value: List<ExerciseModel>?): String {
+        val gson = Gson()
+        val type = object : TypeToken<List<ExerciseModel>>() {}.type
+        return gson.toJson(value, type)
+    }
+
+    @TypeConverter
+    fun toExerciseList(value: String): List<ExerciseModel>? {
+        val gson = Gson()
+        val type = object : TypeToken<List<ExerciseModel>>() {}.type
+        return gson.fromJson(value, type)
+    }
 
     @TypeConverter
     fun fromStringList(value: String): List<String> {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,18 +26,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ehsanmsz.mszprogressindicator.progressindicator.LineScaleProgressIndicator
 import com.example.royalgymfitness.R
 import com.example.royalgymfitness.presentations.home.components.TextComponent
 import com.example.royalgymfitness.presentations.nav_graph.Routes
 import com.example.royalgymfitness.ui.theme.MainColor
 import com.example.royalgymfitness.ui.theme.RoyalGymFitnessTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SplashScreen(navController: NavHostController) {
+
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = MainColor
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -73,8 +82,7 @@ fun SplashScreen(navController: NavHostController) {
                     font = R.font.sans_medium
                 )
 
-                LineScaleProgressIndicator(
-                    modifier = Modifier,
+                ProgressIndicatorAnimation(
                     color = Color.White,
                     animationDuration = 800,
                     animationDelay = 200,
@@ -85,8 +93,8 @@ fun SplashScreen(navController: NavHostController) {
     }
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(key1 = Unit) {
-        delay(3000)
         coroutineScope.launch {
+//            delay(3000)
             navController.navigate(Routes.TabScreen.route) {
                 popUpTo(Routes.SplashScreen.route) {
                     inclusive = true
@@ -97,7 +105,7 @@ fun SplashScreen(navController: NavHostController) {
 }
 
 @Composable
-fun SplashPreview(modifier: Modifier = Modifier) {
+fun SplashPreview() {
     RoyalGymFitnessTheme {
         SplashScreen(navController = NavHostController(LocalContext.current))
     }

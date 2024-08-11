@@ -44,12 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.ehsanmsz.mszprogressindicator.progressindicator.LineScaleProgressIndicator
 import com.example.royalgymfitness.R
 import com.example.royalgymfitness.backend.domain.model.ExerciseModel
+import com.example.royalgymfitness.db.domain.model.ExerciseListEntity
 import com.example.royalgymfitness.db.presentation.ExerciseDBViewModel
 import com.example.royalgymfitness.presentations.home.components.TextComponent
 import com.example.royalgymfitness.presentations.nav_graph.Routes
+import com.example.royalgymfitness.presentations.splash.ProgressIndicatorAnimation
 import com.example.royalgymfitness.ui.theme.DarkBlue
 import com.example.royalgymfitness.ui.theme.MainColor
 import kotlinx.serialization.encodeToString
@@ -61,7 +62,7 @@ import java.nio.charset.StandardCharsets
 fun ExerciseScreen(
     exerciseDbViewModel: ExerciseDBViewModel,
     isFavoriteState: ExerciseState<Boolean>,
-//    exerciseFavListState: ExerciseState<List<ExerciseListEntity>>,
+    listFavExerciseBundle: ExerciseState<List<ExerciseListEntity>>,
     navController: NavHostController,
     exerciseName: String?,
     exerciseImage: String?,
@@ -90,13 +91,7 @@ fun ExerciseScreen(
                     .background(MainColor),
                 contentAlignment = Alignment.Center
             ) {
-                LineScaleProgressIndicator(
-                    modifier = Modifier,
-                    color = Color.White,
-                    animationDuration = 800,
-                    animationDelay = 200,
-                    startDelay = 0
-                )
+                ProgressIndicatorAnimation()
             }
         }
 
@@ -123,8 +118,8 @@ fun ExerciseScreen(
     if (exerciseList.value.isNotEmpty()) {
         LaunchScreen(
             exerciseDbViewModel,
+            listFavExerciseBundle,
             isFavoriteState,
-            exerciseListState,
             navController,
             workoutType,
             exerciseName,
@@ -138,8 +133,8 @@ fun ExerciseScreen(
 @Composable
 fun LaunchScreen(
     exerciseDbViewModel: ExerciseDBViewModel,
+    listFavExerciseBundle: ExerciseState<List<ExerciseListEntity>>,
     isFavoriteState: ExerciseState<Boolean>,
-    exerciseFavListState: ExerciseState<List<ExerciseModel>>,
     navController: NavHostController,
     workoutType: String?,
     exerciseName: String?,
@@ -151,25 +146,33 @@ fun LaunchScreen(
     var isFav by rememberSaveable {
         mutableStateOf(false)
     }
-    //fav like state handle
-//    when(exerciseFavListState){
-//        is ExerciseState.Loading -> {
-//            CircularProgressIndicator()
-//        }
-//        is ExerciseState.Success -> {
-//            val exerciseFavList = exerciseFavListState.data
-//            for (i in exerciseFavList.indices) {
-//                if (exerciseFavList[i].id == exerciseFavList.) {
-//                    isFav = true
-//                }
-//            }
-//        }
-//        is ExerciseState.Error -> {
-//            val errorMessage = exerciseFavListState.message
-//            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-//        }
-//
-//    }
+//    fav like state handle
+    when (listFavExerciseBundle) {
+        is ExerciseState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is ExerciseState.Success -> {
+            val favExerciseBundle = listFavExerciseBundle.data
+            Log.d("@@db", "bundleSize: ${favExerciseBundle.size}")
+            if (favExerciseBundle.isNotEmpty()) {
+                for (i in favExerciseBundle.indices) {
+                    if (favExerciseBundle[i].id == exerciseList.value[0].id) {
+                        Log.d("@@db", "LaunchScreenBundle: ${favExerciseBundle[i].id}")
+                        Log.d("@@db", "LaunchScreenList: ${exerciseList.value[0].id}")
+                        isFav = true
+                    }
+                }
+            }
+
+        }
+
+        is ExerciseState.Error -> {
+            val errorMessage = listFavExerciseBundle.message
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+
+    }
 
     //do like or unlike exercise
     when (isFavoriteState) {
@@ -214,9 +217,18 @@ fun LaunchScreen(
                     workoutType = workoutType,
                     onFavClick = {
                         if (isFav) {
-//                            exerciseDbViewModel.favRemoveListOfExercises(1)
+                            Log.d("@@screen", "LaunchScreenId: ${exerciseList.value[0].id}")
+                            exerciseDbViewModel.favRemoveListOfBundleExercises(exerciseList.value[0].id)
                         } else {
-//                            exerciseDbViewModel.favListOfExercises(exerciseList.value)
+                            val exerciseListEntity =
+                                ExerciseListEntity(
+                                    id = exerciseList.value[0].id,
+                                    exerciseName = exerciseName,
+                                    bundleThumbnailImage = exerciseImage,
+                                    workoutType = workoutType,
+                                    exerciseList = exerciseList.value
+                                )
+                            exerciseDbViewModel.insertBundleFavListOfExercises(exerciseListEntity)
                         }
                     },
                     onBackClick = {
@@ -261,7 +273,6 @@ fun ExerciseImage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 32.dp)
     ) {
         AsyncImage(
             model = exerciseImage.toString(),

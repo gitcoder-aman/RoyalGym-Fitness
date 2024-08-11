@@ -27,8 +27,8 @@ class AppModule {
     @Singleton
     fun provideExerciseDao(exerciseDatabase: ExerciseDatabase) = exerciseDatabase.exerciseDao
 
-//    @Provides
-//    @Singleton
-//    fun provideListOfExerciseDao(exerciseDatabase: ExerciseDatabase) = exerciseDatabase.exerciseListDao
+    @Provides
+    @Singleton
+    fun provideListOfExerciseDao(exerciseDatabase: ExerciseDatabase) = exerciseDatabase.exerciseListDao
 
 }

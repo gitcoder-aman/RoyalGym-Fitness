@@ -33,6 +33,7 @@ import com.example.royalgymfitness.presentations.home.TabSection
 import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_DETAIL_MODEL
 import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_IMAGE
 import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_EXERCISE_NAME
+import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_SEARCH_TEXT
 import com.example.royalgymfitness.presentations.nav_graph.ARG_KEY_WORKOUT_TYPE
 import com.example.royalgymfitness.presentations.nav_graph.Routes
 import com.example.royalgymfitness.presentations.otherscreen.ExerciseDetailScreen
@@ -116,10 +117,23 @@ fun GymNavigator() {
 //                HomeScreen(navController)
 //            }
             composable(route = Routes.FavouriteScreen.route) {
-                FavouriteScreen()
+                val exerciseDbViewModel: ExerciseDBViewModel = hiltViewModel()
+                val listFavExerciseBundle by exerciseDbViewModel.listExerciseBundle.observeAsState(ExerciseState.Loading)
+                val listFavExercise by exerciseDbViewModel.exerciseFavList.observeAsState(ExerciseState.Loading)
+
+                FavouriteScreen(listFavExerciseBundle,listFavExercise,navController)
+
             }
-            composable(route = Routes.AllExerciseScreen.route) {
-                AllExerciseScreen()
+            composable(route = Routes.AllExerciseScreen.route, arguments = listOf(
+                navArgument(ARG_KEY_SEARCH_TEXT){type = NavType.StringType}
+            )) {
+
+                val searchText = remember {
+                    it.arguments?.getString(ARG_KEY_SEARCH_TEXT)
+                }
+                val exerciseViewModel: ExerciseViewModel = hiltViewModel()
+                val exerciseListState by exerciseViewModel.exerciseList.collectAsState()
+                AllExerciseScreen(exerciseListState,navController,searchText)
             }
             composable(
                 route = Routes.ExerciseScreen.route, arguments = listOf(
@@ -178,14 +192,14 @@ fun GymNavigator() {
                 //here to implement db for store exerciseList through favorite section
                 val exerciseDbViewModel: ExerciseDBViewModel = hiltViewModel()
                 val isFavoriteState by exerciseDbViewModel.isFavorite.observeAsState(ExerciseState.Loading)
-//                val exerciseListState by exerciseDbViewModel.listOfExercises.observeAsState(ExerciseState.Loading)
+                val listFavExerciseBundle by exerciseDbViewModel.listExerciseBundle.observeAsState(ExerciseState.Loading)
 
                 when (workoutType) {
                     WorkoutType.TARGET.toString() -> {
                         ExerciseScreen(
                             exerciseDbViewModel,
                             isFavoriteState,
-//                            exerciseListState,
+                            listFavExerciseBundle,
                             navController,
                             exerciseName,
                             exerciseImage,
@@ -198,7 +212,7 @@ fun GymNavigator() {
                         ExerciseScreen(
                             exerciseDbViewModel,
                             isFavoriteState,
-//                            exerciseListState,
+                            listFavExerciseBundle,
                             navController,
                             exerciseName,
                             exerciseImage,
@@ -211,7 +225,7 @@ fun GymNavigator() {
                         ExerciseScreen(
                             exerciseDbViewModel,
                             isFavoriteState,
-//                            exerciseListState,
+                            listFavExerciseBundle,
                             navController,
                             exerciseName,
                             exerciseImage,

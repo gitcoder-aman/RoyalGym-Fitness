@@ -20,11 +20,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +36,8 @@ import coil.compose.AsyncImage
 import com.example.royalgymfitness.R
 import com.example.royalgymfitness.backend.util.WorkoutType
 import com.example.royalgymfitness.backend.util.bodyPartMap
+import com.example.royalgymfitness.backend.util.mapOfDayExerciseImage
+import com.example.royalgymfitness.backend.util.mapOfExerciseListWithDay
 import com.example.royalgymfitness.backend.util.targetMap
 import com.example.royalgymfitness.presentations.home.components.TextComponent
 import com.example.royalgymfitness.presentations.nav_graph.Routes
@@ -68,22 +73,34 @@ fun WeeklyPlanScreen(navController: NavHostController) {
                 "Saturday",
                 "Sunday"
             )
-            val listOfExercises = listOf("Abs", "Biceps", "Triceps")
 
-            items(listOfWeek) { day ->
+            items(listOfWeek) {
                 MessageCardView(
-                    day = day,
-                    listOfExercises = listOfExercises
+                    day = it,
+                    listOfExercises = mapOfExerciseListWithDay[it]!!
                 ) { exercise ->
 
+                    Log.d("@@exerciseName", "Screen: $exercise")
+
+                    var workoutType  = ""
+
+                    if(exercise.isNotEmpty()){
+                        if(targetMap.containsKey(exercise.lowercase())){
+                            workoutType = WorkoutType.TARGET.toString()
+                        }else if(bodyPartMap.containsKey(exercise.lowercase())){
+                            workoutType = WorkoutType.BODY.toString()
+                        }else{
+                            workoutType = WorkoutType.EQUIPMENT.toString()
+                        }
+                    }
                     navController.navigate(
                         Routes.ExerciseScreen.passExercise(
                             exerciseName = exercise,
                             exerciseImage = URLEncoder.encode(
-                                targetMap[exercise.lowercase()],
+                                mapOfDayExerciseImage[exercise.lowercase()],
                                 "UTF-8"
                             ),
-                            workoutType = WorkoutType.TARGET.toString()
+                            workoutType = workoutType
                         )
                     )
                 }

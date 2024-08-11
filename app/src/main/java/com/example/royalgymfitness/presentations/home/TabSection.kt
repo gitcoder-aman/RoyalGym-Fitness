@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -20,14 +21,23 @@ import com.example.royalgymfitness.R
 import com.example.royalgymfitness.presentations.home.components.TextComponent
 import com.example.royalgymfitness.presentations.home.weekly_plan.WeeklyPlanScreen
 import com.example.royalgymfitness.ui.theme.DarkBlue
+import com.example.royalgymfitness.ui.theme.MainColor
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun TabSection(navController: NavHostController) {
+
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = DarkBlue
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBlue)
-            .padding(top = 28.dp),
     ) {
 
         var selectedTabIndex by rememberSaveable {
