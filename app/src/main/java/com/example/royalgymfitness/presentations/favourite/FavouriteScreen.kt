@@ -120,7 +120,7 @@ fun FavouriteScreen(
                 // Exercise list as separate items in the main LazyColumn
                 items(listFavExerciseList.value.size) {
                     ExercisesView(
-                        exerciseName = listFavExerciseList.value[it].name.capitalize(Locale.ROOT),
+                        exerciseName = listFavExerciseList.value[it].name.capitalize(Locale.ROOT).replace("+"," "),
                         equipmentName = listFavExerciseList.value[it].equipment.capitalize(Locale.ROOT),
                         exerciseImage = listFavExerciseList.value[it].gifUrl
                     ) {

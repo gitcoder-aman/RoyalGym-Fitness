@@ -15,21 +15,21 @@ interface ExerciseAPI {
     )
     suspend fun getExercise() : List<ExerciseModel>
 
-    @GET("/exercises/target/{target}?limit=2")
+    @GET("/exercises/target/{target}")
     @Headers(
         "x-rapidapi-key: ${Constants.API_KEY}",
         "x-rapidapi-host: ${Constants.API_HOST}"
     )
     suspend fun getTarget(@Path("target") target: String) : List<ExerciseModel>
 
-    @GET("/exercises/bodyPart/{bodyPart}?limit=2")
+    @GET("/exercises/bodyPart/{bodyPart}")
     @Headers(
         "x-rapidapi-key: ${Constants.API_KEY}",
         "x-rapidapi-host: ${Constants.API_HOST}"
     )
     suspend fun getBodyPart(@Path("bodyPart") bodyPart: String) : List<ExerciseModel>
 
-    @GET("/exercises/equipment/{equipment}?limit=2")
+    @GET("/exercises/equipment/{equipment}")
     @Headers(
         "x-rapidapi-key: ${Constants.API_KEY}",
         "x-rapidapi-host: ${Constants.API_HOST}"

@@ -87,9 +87,7 @@ fun AllExerciseScreen(
         var searchText by rememberSaveable {
             mutableStateOf("")
         }
-        if (homeSearchText != null && homeSearchText != "{arg_key_search_text}") {
-            searchText = homeSearchText
-        }
+
         // Filtered list based on search query
         val filteredItems = remember(searchText) {
             exerciseList.filter {
@@ -123,6 +121,13 @@ fun AllExerciseScreen(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
 
+                if (homeSearchText != null && homeSearchText != "{arg_key_search_text}" && searchText == "") {
+                    TextComponent(
+                        text = homeSearchText.toString(),
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
                 LazyColumn(
                     modifier = Modifier
                         .padding(top = 8.dp)

@@ -22,7 +22,8 @@ fun TextComponent(
     color: Color = Color.White,
     font: Int = R.font.sans_regular,
     fontSize: TextUnit,
-    fontStyle: FontStyle = FontStyle.Normal
+    fontStyle: FontStyle = FontStyle.Normal,
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = text, style = TextStyle(
@@ -33,6 +34,7 @@ fun TextComponent(
             ),
             fontSize = fontSize,
             fontStyle = fontStyle
-        )
+        ),
+        modifier = modifier
     )
 }
