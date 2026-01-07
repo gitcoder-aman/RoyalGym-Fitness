@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
@@ -10,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.example.royalgymfitness"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.royalgymfitness"
@@ -38,9 +39,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+        }
     }
+
     buildFeatures {
         compose = true
     }
@@ -114,6 +118,8 @@ dependencies {
 
     //for status bar color change
     implementation(libs.accompanist.systemuicontroller)
+
+    implementation(libs.androidx.material.icons.extended)
 
 
 }

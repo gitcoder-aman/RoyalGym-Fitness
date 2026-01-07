@@ -19,7 +19,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,7 +31,6 @@ import com.example.royalgymfitness.presentations.nav_graph.Routes
 import com.example.royalgymfitness.ui.theme.MainColor
 import com.example.royalgymfitness.ui.theme.RoyalGymFitnessTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -77,17 +75,17 @@ fun SplashScreen(navController: NavHostController) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextComponent(
-                    text = "Royal Gym Fitness Chakand",
+                    text = "Royal Gym Fitness",
                     fontSize = 24.sp,
                     font = R.font.sans_medium
                 )
 
-                ProgressIndicatorAnimation(
-                    color = Color.White,
-                    animationDuration = 800,
-                    animationDelay = 200,
-                    startDelay = 0
-                )
+//                ProgressIndicatorAnimation(
+//                    color = Color.White,
+//                    animationDuration = 800,
+//                    animationDelay = 200,
+//                    startDelay = 0
+//                )
             }
         }
     }

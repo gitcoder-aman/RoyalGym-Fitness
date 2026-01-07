@@ -8,7 +8,7 @@ import retrofit2.http.Path
 
 interface ExerciseAPI {
 
-    @GET("/exercises?limit=100")
+    @GET("/exercises?limit=20")
     @Headers(
         "x-rapidapi-key: ${Constants.API_KEY}",
         "x-rapidapi-host: ${Constants.API_HOST}"

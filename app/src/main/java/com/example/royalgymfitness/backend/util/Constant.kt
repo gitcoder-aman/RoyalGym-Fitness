@@ -2,7 +2,7 @@ package com.example.royalgymfitness.backend.util
 
 object Constants {
     const val BASE_URL = "https://exercisedb.p.rapidapi.com/"
-    const val API_KEY = "195d32fc07msh0e9cb0c36eb5f03p1f8f0ajsn3562391725e3"
+    const val API_KEY = "21d0b5b351msh5376514b6549dbap1fe003jsnaa911676b84b"
     const val API_HOST = "exercisedb.p.rapidapi.com"
 }
 

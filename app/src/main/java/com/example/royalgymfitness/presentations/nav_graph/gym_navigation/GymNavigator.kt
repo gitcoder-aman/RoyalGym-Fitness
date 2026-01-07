@@ -1,6 +1,15 @@
 package com.example.royalgymfitness.presentations.nav_graph.gym_navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -14,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -40,7 +49,6 @@ import com.example.royalgymfitness.presentations.otherscreen.ExerciseDetailScree
 import com.example.royalgymfitness.presentations.otherscreen.ExerciseScreen
 import com.example.royalgymfitness.presentations.otherscreen.ExerciseState
 import com.example.royalgymfitness.presentations.splash.SplashScreen
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.net.URLDecoder
 import java.util.Locale
@@ -69,7 +77,9 @@ fun GymNavigator() {
         }
     }
     val isBottomBarVisible = remember(key1 = backStackState) {
-        backStackState?.destination?.route == Routes.TabScreen.route || backStackState?.destination?.route == Routes.FavouriteScreen.route || backStackState?.destination?.route == Routes.AllExerciseScreen.route
+        backStackState?.destination?.route == Routes.TabScreen.route ||
+                backStackState?.destination?.route == Routes.FavouriteScreen.route ||
+                backStackState?.destination?.route == Routes.AllExerciseScreen.route
     }
 
     Scaffold(
@@ -105,7 +115,9 @@ fun GymNavigator() {
         NavHost(
             navController = navController,
             startDestination = Routes.SplashScreen.route,
-            modifier = Modifier.padding(bottom = bottomPadding)
+            modifier = Modifier.padding(bottom = bottomPadding),
+            enterTransition = { EnterTransition.None},
+            exitTransition = { ExitTransition.None}
         ) {
             composable(route = Routes.SplashScreen.route) {
                 SplashScreen(navController)
@@ -140,7 +152,25 @@ fun GymNavigator() {
                     navArgument(ARG_KEY_EXERCISE_IMAGE) { type = NavType.StringType },
                     navArgument(ARG_KEY_EXERCISE_NAME) { type = NavType.StringType },
                     navArgument(ARG_KEY_WORKOUT_TYPE) { type = NavType.StringType }
-                )
+                ), enterTransition = {
+                    fadeIn(
+                        animationSpec = tween(
+                            300, easing = LinearEasing
+                        )
+                    ) + slideIntoContainer(
+                        animationSpec = tween(300, easing = EaseIn),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                }, exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(
+                            300, easing = LinearEasing
+                        )
+                    ) + slideOutOfContainer(
+                        animationSpec = tween(300, easing = EaseOut),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                }
             ) {
                 val exerciseImage = remember {
                     it.arguments?.getString(ARG_KEY_EXERCISE_IMAGE)
@@ -148,7 +178,7 @@ fun GymNavigator() {
                 }
                 val exerciseName = remember {
                     it.arguments?.getString(ARG_KEY_EXERCISE_NAME)?.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()  //  Checks the first letter only If it is lowercase → converts it to uppercase using device locale
                     }
                 }
                 val workoutType = remember {
